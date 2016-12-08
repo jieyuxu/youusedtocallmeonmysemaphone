@@ -5,8 +5,10 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 #include <unistd.h>
+#include <time.h>
+#include <string.h>
 
-int client(){
+int main(){
 	srand(time(NULL));
 	int x = random() % 10 + 5;
 	
@@ -19,8 +21,9 @@ int client(){
 	sb.sem_op = -1;
 	
 	semop(semid, &sb, 1); //gotta give address to sembuf structure. 1 bc there's only 1 semaphore
+	printf("%d\n", semid);
 	printf("[%d] I'm in!\n" , getpid());
-	sleep(x);
+	sleep(5);
 	sb.sem_op = 1;
 	semop(semid, &sb, 1);
 	printf("[%d] I'm done\n", getpid());

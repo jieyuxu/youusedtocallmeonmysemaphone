@@ -5,6 +5,8 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 #include <unistd.h>
+#include <time.h>
+#include <string.h>
 
 int main(int argc, char *argv[]){
 		int semid;
