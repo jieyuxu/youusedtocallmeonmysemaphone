@@ -6,7 +6,7 @@
 #include <sys/shm.h>
 #include <unistd.h>
 
-int main(){
+int client(){
 	srand(time(NULL));
 	int x = random() % 10 + 5;
 	

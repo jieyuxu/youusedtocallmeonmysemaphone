@@ -40,6 +40,6 @@ int main(int argc, char *argv[]){
 			sc = semctl(semid, 0, IPC_RMID);
 			printf("semaphore removed: %d\n", sc);
 		 }
-		 
+
 		return 0;
 }
