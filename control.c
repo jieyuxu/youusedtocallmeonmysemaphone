@@ -22,7 +22,7 @@ void printstory(){
 	storage[buffer.st_size + 1] = 0;
 	
 	printf("Full story:\n");
-	printf("%s", storage);
+	printf("%s\n", storage);
 	
 }
 
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
 		int semid, shmid;
 		//call ftok on a random file name with a random number and it'll create or attempt to create unique key
 		int key = ftok("makefile" , 22);
-		int sc, sh, fd, value;
+		int fd, value;
 		int * shmatr;
 		if (argv[2])
 			value = atoi(argv[2]);
@@ -46,20 +46,15 @@ int main(int argc, char *argv[]){
 			union semun su;
 			su.val = value;
 			semctl(semid, 0, SETVAL, su);
-			//printf("value set: %d\n", sc);
 
 			//hello shared memory
 			shmid = shmget(key, sizeof(key), IPC_CREAT | /*IPC_EXCL*/ 0644);
 			shmatr = (int *)shmat(shmid, 0, 0);
 			*shmatr = 0;
-			//printf("shared mem created: %d\n", shmid);
 
 			//hello story.txt
 			fd = open("story.txt", O_CREAT | O_TRUNC, 0644);
-			//printf("file created/accessed %d\n", fd);
 			close(fd);
-			
-
 		}
 		else if (strncmp(argv[1], "-v", strlen(argv[1])) == 0){
 			printstory();
@@ -67,11 +62,11 @@ int main(int argc, char *argv[]){
 		else if(strncmp(argv[1], "-r", strlen(argv[1])) == 0){
 			//removing a semaphore
 			semid = semget(key, 1, 0);
-			sc = semctl(semid, 0, IPC_RMID);
+			semctl(semid, 0, IPC_RMID);
 
 			//removing shared mem
-			shmid = shmget(key, sizeof(shmid), 0);
-			sh = semctl(shmid, IPC_RMID, 0);
+			shmid = shmget(key, sizeof(key), 0);
+			shmctl(shmid, IPC_RMID, 0);
 			printf("%s\n", strerror(errno));
 			
 			printstory();
