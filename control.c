@@ -9,6 +9,7 @@
 #include <time.h>
 #include <string.h>
 #include <fcntl.h>
+#include <errno.h>
 
 void printstory(){
 	int fd = open("story.txt", O_RDONLY);
@@ -18,7 +19,7 @@ void printstory(){
 	char storage[buffer.st_size + 1];
 	read(fd, storage, buffer.st_size);
 	//set end to null
-	storage[buffer.st_size + 1] = "\0";
+	storage[buffer.st_size + 1] = 0;
 	
 	printf("Full story:\n");
 	printf("%s", storage);
@@ -29,8 +30,7 @@ int main(int argc, char *argv[]){
 		int semid, shmid;
 		//call ftok on a random file name with a random number and it'll create or attempt to create unique key
 		int key = ftok("makefile" , 22);
-		int sc, sh;
-		int value;
+		int sc, sh, fd, value;
 		int * shmatr;
 		if (argv[2])
 			value = atoi(argv[2]);
@@ -38,26 +38,28 @@ int main(int argc, char *argv[]){
 			value = 1;
 			
 		if (strncmp(argv[1], "-c", strlen(argv[1])) == 0){
-			//creating a shared memory
-			shmid = shmget(key, 0, O_CREAT | 0644);
+			//hello semaphore
+			semid = semget(key, 1, IPC_CREAT | 0644);
+			printf("semaphore created: %d\n", semid);
+
+			//setting semaphore value
+			union semun su;
+			su.val = value;
+			semctl(semid, 0, SETVAL, su);
+			//printf("value set: %d\n", sc);
+
+			//hello shared memory
+			shmid = shmget(key, sizeof(key), IPC_CREAT | /*IPC_EXCL*/ 0644);
 			shmatr = (int *)shmat(shmid, 0, 0);
 			*shmatr = 0;
-			
-			//creating a semaphore
-			semid = semget(key, 1, IPC_CREAT | IPC_EXCL | 0644);
-			union semun su;
-			su.val = value; //setting val of int to 1;
-			//setting semaphore value
-			sc = semctl(semid, 0, SETVAL, su);
-			
-			//make file
-			int fd = open("story.txt", O_CREAT | O_TRUNC, 0644);
-			if (fd == -1){
-				printf("file not opened.");
-				exit(0);
-			}
+			//printf("shared mem created: %d\n", shmid);
+
+			//hello story.txt
+			fd = open("story.txt", O_CREAT | O_TRUNC, 0644);
+			//printf("file created/accessed %d\n", fd);
 			close(fd);
-			printf("New story created.");
+			
+
 		}
 		else if (strncmp(argv[1], "-v", strlen(argv[1])) == 0){
 			printstory();
@@ -66,9 +68,11 @@ int main(int argc, char *argv[]){
 			//removing a semaphore
 			semid = semget(key, 1, 0);
 			sc = semctl(semid, 0, IPC_RMID);
-			
+
+			//removing shared mem
 			shmid = shmget(key, sizeof(shmid), 0);
-			sh = semctl(shmid, 0, IPC_RMID);
+			sh = semctl(shmid, IPC_RMID, 0);
+			printf("%s\n", strerror(errno));
 			
 			printstory();
 		 }
