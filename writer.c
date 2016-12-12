@@ -7,13 +7,14 @@
 #include <unistd.h>
 #include <time.h>
 #include <string.h>
+#include <fcntl.h>
 
 int main(){
 	int *shmp; 
 	int semid, shmid, key, len;
 	key = ftok("makefile",22);
 	semid = semget(key, 1, 0);
-	printf("[%d] before access\n", getpid());
+	printf("[%d]: hello.\n",getpid());
 	
 	struct sembuf sb;
 	sb.sem_num = 0; //index. there's only one so 0
@@ -30,7 +31,7 @@ int main(){
 	lseek(fd, len * -1, SEEK_END);
 	char line[len+1];
 	read(fd, line, len);
-	line[len] = NULL;	
+	line[len] = 0;	
 	close(fd);
 	printf(">> %s\n",line);
 	
@@ -45,6 +46,6 @@ int main(){
 	sb.sem_op = 1;
 	semop(semid, &sb, 1);
 	
-	printf("[%d] thank you for your contribution\n", getpid());
+	printf("[%d]: thank you for your contribution.\n", getpid());
 	return 0;
 }
