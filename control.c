@@ -13,6 +13,10 @@
 
 void printstory(){
 	int fd = open("story.txt", O_RDONLY);
+	if (fd == -1){
+		printf("story cannot be opened\n");
+		exit(0);
+	}
 	struct stat buffer;
 	stat("story.txt", &buffer);
 	int sz = buffer.st_size;
@@ -20,7 +24,7 @@ void printstory(){
 	char storage[sz + 1];
 	read(fd, storage, sz);
 	//set end to null
-	storage[sz + 1] = 0;
+	storage[sz] = 0;
 	
 	printf("Full story:\n");
 	printf("%s\n", storage);
