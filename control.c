@@ -67,7 +67,6 @@ int main(int argc, char *argv[]){
 			//removing shared mem
 			shmid = shmget(key, sizeof(key), 0);
 			shmctl(shmid, IPC_RMID, 0);
-			printf("%s\n", strerror(errno));
 			
 			printstory();
 		 }
