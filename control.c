@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
 			shmid = shmget(key, sizeof(key), IPC_CREAT | /*IPC_EXCL*/ 0644);
 			shmatr = (int *)shmat(shmid, 0, 0);
 			*shmatr = 0;
-
+			printf("shared mem created: %d\n",shmid);
 			//hello story.txt
 			fd = open("story.txt", O_CREAT | O_TRUNC, 0644);
 			close(fd);
