@@ -15,11 +15,12 @@ void printstory(){
 	int fd = open("story.txt", O_RDONLY);
 	struct stat buffer;
 	stat("story.txt", &buffer);
-	
-	char storage[buffer.st_size + 1];
-	read(fd, storage, buffer.st_size);
+	int sz = buffer.st_size;
+
+	char storage[sz + 1];
+	read(fd, storage, sz);
 	//set end to null
-	storage[buffer.st_size + 1] = 0;
+	storage[sz + 1] = 0;
 	
 	printf("Full story:\n");
 	printf("%s\n", storage);
